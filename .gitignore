@@ -1,0 +1,9 @@
+contracts/cache
+contracts/out
+contracts/docs
+contracts/.env
+contracts/!/broadcast
+contracts/*/31337/
+contracts/**/dry-run/
+
+circuits/target/
