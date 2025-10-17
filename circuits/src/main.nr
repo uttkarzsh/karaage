@@ -1,11 +1,4 @@
-fn main(x: Field, y: pub Field) {
-    assert(x != y);
+fn main(amount: u128, _address: pub Field, min_amount: pub u128) {
+    assert(amount >= min_amount);
 }
 
-#[test]
-fn test_main() {
-    main(1, 2);
-
-    // Uncomment to make test fail
-    // main(1, 1);
-}
