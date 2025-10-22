@@ -7,3 +7,5 @@ contracts/*/31337/
 contracts/**/dry-run/
 
 circuits/target/
+
+*/node_modules
