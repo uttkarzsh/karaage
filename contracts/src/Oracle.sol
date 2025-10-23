@@ -6,8 +6,8 @@ import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/shared/inte
 contract Oracle{
     AggregatorV3Interface public dataFeed;
 
-    constructor(){
-        dataFeed = AggregatorV3Interface(0xb9d461e0b962aF219866aDfA7DD19C52bB9871b9);
+    constructor(address priceFeed){
+        dataFeed = AggregatorV3Interface(priceFeed);
     }
 
     function getPrice() public view returns(int256){
