@@ -1,35 +1,36 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import logo from './assets/logokaraage.jpeg';
+import { ConnectWalletButton } from './components/ConnectWalletButton';
+import Dashboard from './pages/Dashboard';
+import { Sidebar } from './components/layout/Sidebar';
+import Borrow from './pages/Borrow';
+import Collateral from './pages/Collateral';
+import { useGlobalState } from './store/globalState';
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const { currentPage } = useGlobalState();
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="min-h-screen flex flex-col items-center justify-start bg-karaageBg">
+      <div className="w-full flex flex-col items-center mt-10">
+        <img
+          src={logo}
+          alt="Karaage Logo"
+          className="w-36 h-36 mb-2 object-contain"
+          style={{ borderRadius: 32, boxShadow: "0 2px 20px #A45B2455" }}
+        />
+        <h1 className="text-5xl font-serif text-karaageBrown font-bold tracking-wide">
+          KARAAGE
+        </h1>
+        <ConnectWalletButton />
+        <div className="w-full max-w-md space-y-6 mt-2">
+          <Sidebar />
+          <main className="flex-1 p-6 overflow-y-auto">
+        {currentPage === "dashboard" && <Dashboard />}
+        {currentPage === "collateral" && <Collateral />}
+        {currentPage === "borrow" && <Borrow />}
+      </main>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </div>
+  );
 }
-
-export default App
