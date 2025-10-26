@@ -7,14 +7,17 @@ import { OApp, Origin, MessagingFee } from "@layerzerolabs/oapp-evm/contracts/oa
 import { OAppOptionsType3 } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OAppOptionsType3.sol";
 
 contract KaraageLendingPool {
+    IVerifier verifier;
+
     struct UserInfo {
         uint256 ethCollateral;
         uint256 debt;
         bool isCollateralFresh;
     }
 
-    constructor(address _endpoint, address _owner, address _ethOApp) OApp(_endpoint, _owner) Ownable(_owner) {
+    constructor(address _endpoint, address _owner, address _ethOApp, IVerifier _verifier) OApp(_endpoint, _owner) Ownable(_owner) {
         ethOApp = _ethOApp;
+        verifier = IVerifier(_verifier);
     }
 
     mapping(address => UserInfo) public users;
@@ -30,13 +33,17 @@ contract KaraageLendingPool {
     error KaraageLendingPool__ExceedsBorrowLimit();
     error KaraageLendingPool__NoCollateral();
     error KaraageLendingPool__NotFresh();
+    error KaraageLendingPool__ProofInvalid();
 
     modifier onlyEthOApp() {
         if (msg.sender != ethOApp) revert KaraageLendingPool__NotAuthorized();
         _;
     }
     
-    function syncCollateral(address user, uint256 newCollateral) external onlyEthOApp {
+    function syncCollateral(address user, uint256 newCollateral, bytes calldata _proof, bytes32[] calldata _publicInputs) external onlyEthOApp {
+        if(!verifier.verify(_proof, _publicInputs)) {
+            revert KaraageLendingPool__ProofInvalid();
+        }
         users[user].ethCollateral = newCollateral;
         users[user].isCollateralFresh = true;
         emit CollateralSync(user, newCollateral);
