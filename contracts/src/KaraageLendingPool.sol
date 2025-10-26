@@ -1,12 +1,22 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
+import {Oracle} from "./Oracle.sol";
+import {IVerifier} from "./Verifier.sol";
+import { OApp, Origin, MessagingFee } from "@layerzerolabs/oapp-evm/contracts/oapp/OApp.sol";
+import { OAppOptionsType3 } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OAppOptionsType3.sol";
+
 contract KaraageLendingPool {
     struct UserInfo {
         uint256 ethCollateral;
         uint256 debt;
         bool isCollateralFresh;
     }
+
+    constructor(address _endpoint, address _owner, address _ethOApp) OApp(_endpoint, _owner) Ownable(_owner) {
+        ethOApp = _ethOApp;
+    }
+
     mapping(address => UserInfo) public users;
 
     uint256 public constant LTV = 75; 
@@ -25,11 +35,6 @@ contract KaraageLendingPool {
         if (msg.sender != ethOApp) revert KaraageLendingPool__NotAuthorized();
         _;
     }
-
-    constructor(address _ethOApp) {
-        ethOApp = _ethOApp;
-    }
-
     
     function syncCollateral(address user, uint256 newCollateral) external onlyEthOApp {
         users[user].ethCollateral = newCollateral;
@@ -63,5 +68,18 @@ contract KaraageLendingPool {
         require(amount > 0 && u.debt >= amount, "Invalid repay");
         u.debt -= amount;   
         emit Repay(msg.sender, amount);
+    }
+
+    function _lzReceive(
+        Origin calldata /*_origin*/,
+        bytes32 /*_guid*/,
+        bytes calldata _message,
+        address /*_executor*/,
+        bytes calldata /*_extraData*/
+    ) internal override {
+
+        string memory _string = abi.decode(_message, (string));
+
+        lastMessage = _string;
     }
 }
